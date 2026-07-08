@@ -4,9 +4,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import ReentrantCallbackGroup
-from geometry_msgs.msg import TwistStamped, Pose2D
+from geometry_msgs.msg import Twist, Pose2D
 from nav_msgs.msg import Odometry
-from tf_transformations import euler_from_quaternion
 from tb3_interfaces.srv import MoveToPose
 
 
@@ -53,7 +52,7 @@ class RobotController(Node):
         )
 
         # Send speed commands to robot
-        self.speed_pub = self.create_publisher(TwistStamped, '/cmd_vel', 10)
+        self.speed_pub = self.create_publisher(Twist, '/cmd_vel', 10)
 
         # Offer the move_to_pose service
         self.create_service(
@@ -75,7 +74,8 @@ class RobotController(Node):
         self.y = msg.pose.pose.position.y
 
         q = msg.pose.pose.orientation
-        _, _, self.yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])
+        self.yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y),
+                              1.0 - 2.0 * (q.y * q.y + q.z * q.z))
 
 
     def got_goal_topic(self, msg):
@@ -150,6 +150,11 @@ class RobotController(Node):
             self.get_logger().info('Reached goal!')
             # Signal the service that we are done
             self.done.set()
+            self.get_logger().info(
+                f'Final errors: distance={distance:.3f} '
+                f'heading={heading_error:.1f} degrees '
+                f'orientation={orientation_error:.1f} degrees'
+            )
             return
 
         # Calculate speeds
@@ -168,11 +173,9 @@ class RobotController(Node):
 
 
     def send_speed(self, forward, turn):
-        msg = TwistStamped()
-        msg.header.stamp    = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'base_link'
-        msg.twist.linear.x  = forward
-        msg.twist.angular.z = turn
+        msg = Twist()
+        msg.linear.x  = forward
+        msg.angular.z = turn
         self.speed_pub.publish(msg)
 
 

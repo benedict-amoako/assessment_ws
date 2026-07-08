@@ -4,7 +4,6 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from math import sqrt, pow, atan2, sin, cos, pi
-import tf_transformations
 from pose_controller_interface.srv import SetPose
 
 class PoseController(Node):
@@ -48,8 +47,8 @@ class PoseController(Node):
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
         orientation_q = msg.pose.pose.orientation
-        _, _, self.yaw = tf_transformations.euler_from_quaternion(
-            [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
+        self.yaw = atan2(2.0 * (orientation_q.w * orientation_q.z + orientation_q.x * orientation_q.y),
+                         1.0 - 2.0 * (orientation_q.y * orientation_q.y + orientation_q.z * orientation_q.z))
         self.control_loop()
 
     def set_target_pose_callback(self, request, response):
