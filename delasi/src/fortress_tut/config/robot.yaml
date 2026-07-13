@@ -1,0 +1,13 @@
+/robot:
+  ros__parameters:
+    Kd: 2.5
+    Ki: 0.075
+    Kp: 1.0
+    Kpo: 1.0
+    Kpp: 0.1
+    Ts: 0.05
+    tol_x: 0.05
+    tol_y: 0.05
+    tol_yaw: 0.0175
+    use_sim_time: false
+
