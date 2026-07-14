@@ -1,6 +1,6 @@
 #! usr/bin/env python3
 
-from math import atan, atan2, sqrt
+from math import atan, atan2, sqrt, radians
 from functools import partial
 
 import rclpy
@@ -101,7 +101,7 @@ class RobotNode(Node):
     def move_turtlebot3(self, request: MoveTurtlebot.Request, response: MoveTurtlebot.Response):
         response.success = False
         Ts = self.get_parameter("Ts").get_parameter_value().double_value
-        self.position_controller_sampler = self.create_timer(Ts, partial(self.position_callback, request.x, request.y, request.yaw))
+        self.position_controller_sampler = self.create_timer(Ts, partial(self.position_callback, request.x, request.y, radians(request.yaw)))
         response.success = True
         return response
 
