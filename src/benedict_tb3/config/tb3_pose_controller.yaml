@@ -1,0 +1,29 @@
+tb3_pose_controller:
+  ros__parameters:
+    # Siegwart polar-law gains. Stability: k_rho > 0, k_beta < 0,
+    # k_alpha - k_rho > 0 (see README.md).
+    k_rho: 0.3
+    k_alpha: 1.0
+    k_beta: -0.3
+
+    # TurtleBot3 Burger hardware limits.
+    max_lin_vel: 0.22        # m/s
+    max_ang_vel: 2.84        # rad/s
+
+    # Acceleration limits: bound how fast commanded velocity may change,
+    # on top of the hard max above, so commands ramp instead of jumping.
+    linear_accel_limit: 0.5   # m/s^2
+    angular_accel_limit: 3.0  # rad/s^2
+
+    # Goal tolerances.
+    pos_tolerance: 0.04       # metres
+    ang_tolerance: 4.0        # degrees
+
+    # Width above pos_tolerance over which the approach law blends into
+    # the final-orientation law, so the two phases meet continuously.
+    blend_zone: 0.15          # metres
+
+    # Consecutive ticks yaw_err must stay inside ang_tolerance before the
+    # goal is declared reached, so residual rotational momentum settles
+    # under active control rather than coasting past tolerance.
+    settle_cycles: 5
